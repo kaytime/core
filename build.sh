@@ -32,7 +32,7 @@ apt -yy install $XORRISO_PKGS $GRUB_EFI_PKGS --no-install-recommends >/dev/null
 
 #	base image URL.
 
-base_img_url=http://cdimage.ubuntu.com/ubuntu-base/releases/20.04/release/ubuntu-base-20.04.3-base-amd64.tar.gz
+base_img_url=https://raw.githubusercontent.com/kaytime/storage/master/RootFS/Debian/Unstable/rootfs.tar.xz
 
 #	Prepare the directories for the build.
 
