@@ -184,9 +184,9 @@ install $NVIDIA_DRV_PKGS
 #	Ubuntu which provides the virtual package libboost-python1.71.0-py38. The package from Debian doesn't
 #	offer this virtual dependency.
 
-puts "ADDING CALAMARES INSTALLER."
+# puts "ADDING CALAMARES INSTALLER."
 
-adding_system_installer
+# adding_system_installer
 
 #	Upgrade MESA packages.
 
