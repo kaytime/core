@@ -48,6 +48,7 @@ config_dir=$PWD/builder/configs
 
 git_commit=$(git rev-parse --short HEAD)
 image=kaytime-core-$(printf "$GITHUB_BRANCH\n")-$(printf "$git_commit")-amd64.iso
+root_fs=kaytime-core-$(printf "$GITHUB_BRANCH\n")-$(printf "$git_commit")-rootfs.tar
 # image=nitrux-$(printf "$TRAVIS_BRANCH\n" | sed "s/legacy/nx-desktop/")-$(date +%Y%m%d)-amd64.iso
 hash_url=http://updates.os.kaytime.com/${image%.iso}.md5sum
 
@@ -58,6 +59,8 @@ tar xf base.tar.xz -C $build_dir
 
 # Install build tools
 
+printf "Installing build tools... "
+
 git clone https://github.com/kaytime/system-builder-kit builder
 
 cd $PWD/builder/tools/runch /bin/runch
@@ -66,6 +69,8 @@ chmod +x /bin/runch
 chmod +x /bin/mkiso
 
 #	Populate $build_dir.
+
+printf "Creating filesystem... "
 
 runch core.sh $GIT_BRANCH \
     -m builder/configs:/configs \
@@ -82,6 +87,22 @@ du -hs $build_dir
 #	Remove CI leftovers.
 
 rm -r $iso_dir/home/{travis,Travis} || true
+
+#	Create RootFS File.
+
+printf "Creating $root_fs... "
+
+cd "$build_dir"
+tar -cpf ../"$output_dir/$root_fs" *
+cd ..
+echo "Done!"
+
+echo "Compressing $root_fs with XZ (using $(nproc) threads)..."
+xz -v --threads=$(nproc) "$root_fs"
+echo "Successfully created $root_fs.xz."
+
+printf "SHA256 checksum for this build: "
+sha256sum "$output_dir/$root_fs".xz | sed "s/  "$output_dir/$root_fs".xz//"
 
 #	Copy the kernel and initramfs to $iso_dir.
 #	BUG: vmlinuz and initrd are not moved to $iso_dir/; they're left at $build_dir/boot
@@ -132,9 +153,3 @@ mkiso \
 #	Calculate the checksum.
 
 md5sum $output_dir/$image >$output_dir/${image%.iso}.md5sum
-
-#	Upload the ISO image.
-
-for f in $output_dir/*; do
-    SSHPASS=$FOSSHOST_PASSWORD sshpass -e scp -q -o stricthostkeychecking=no "$f" $FOSSHOST_USERNAME@$FOSSHOST_HOST:$FOSSHOST_DEPLOY_PATH
-done
