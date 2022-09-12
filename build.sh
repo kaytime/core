@@ -32,6 +32,8 @@ apt -yy install $XORRISO_PKGS $GRUB_EFI_PKGS --no-install-recommends >/dev/null
 
 #	base image URL.
 
+git_commit=$(git rev-parse --short HEAD)
+git_current_branch=$(git rev-parse --abbrev-ref HEAD)
 base_img_url=https://raw.githubusercontent.com/kaytime/storage/master/RootFS/Debian/Unstable/rootfs.tar.xz
 
 #	Prepare the directories for the build.
@@ -46,10 +48,9 @@ config_dir=$PWD/builder/configs
 
 #	The name of the ISO image.
 
-git_commit=$(git rev-parse --short HEAD)
-image=kaytime-core-$(printf "$GITHUB_BRANCH\n")-$(printf "$git_commit")-amd64.iso
-root_fs=kaytime-core-$(printf "$GITHUB_BRANCH\n")-$(printf "$git_commit")-rootfs.tar
-# image=nitrux-$(printf "$TRAVIS_BRANCH\n" | sed "s/legacy/nx-desktop/")-$(date +%Y%m%d)-amd64.iso
+image=kaytime-core-$(printf "$git_current_branch\n")-$(printf "$git_commit")-amd64.iso
+root_fs=kaytime-core-$(printf "$git_current_branch\n")-$(printf "$git_commit")-rootfs.tar
+root_fs_latest=kaytime-core-$(printf "$git_current_branch\n")-latest-rootfs.tar
 hash_url=http://updates.os.kaytime.com/${image%.iso}.md5sum
 
 #	Prepare the directory where the filesystem will be created.
@@ -72,7 +73,7 @@ chmod +x /bin/mkiso
 
 printf "Creating filesystem... "
 
-runch core.sh $GIT_BRANCH \
+runch core.sh $git_current_branch \
     -m builder/configs:/configs \
     -r /configs \
     -m layouts:/layouts \
@@ -103,6 +104,8 @@ echo "Successfully created $root_fs.xz."
 
 printf "SHA256 checksum for this build: "
 sha256sum "$output_dir/$root_fs".xz | sed "s/  "$output_dir/$root_fs".xz//"
+
+cp $output_dir/$root_fs".xz" $output_dir/$root_fs_latest".xz"
 
 #	Copy the kernel and initramfs to $iso_dir.
 #	BUG: vmlinuz and initrd are not moved to $iso_dir/; they're left at $build_dir/boot
@@ -153,3 +156,5 @@ mkiso \
 #	Calculate the checksum.
 
 md5sum $output_dir/$image >$output_dir/${image%.iso}.md5sum
+
+echo "Done!"
