@@ -40,7 +40,28 @@ puts "ADDING REPOSITORY KEYS."
 
 add_kaytime_key_repo
 add_kaytime_key_compat
-add_kaytime_key_testing
+
+while :; do
+	case $BUILD_CHANNEL in
+	stable)
+		add_kaytime_key_stable
+		break
+		;;
+	unstable)
+		add_kaytime_key_unstable
+		break
+		;;
+	testing)
+		add_kaytime_key_testing
+		break
+		;;
+	*)
+		echo "This branch $BUILD_CHANNEL doesn't not exist"
+		exit
+		break
+		;;
+	esac
+done
 
 #	Copy repository sources.
 
@@ -121,6 +142,10 @@ puts "ADDING PLYMOUTH."
 
 adding_plymouth
 
+puts "ADDING BOOTSCREEN."
+
+adding_system_bootscreen
+
 #	Adding PolicyKit packages from Devuan.
 #
 #	Since we're using elogind to replace logind, we need to add the matching PolicyKit packages.
@@ -142,7 +167,7 @@ puts "ADDING DEVUAN MISC. PACKAGES."
 
 adding_devuan_misc_packages
 
-#	Add Kaytime Drivers meta-packages.
+#	Add Kaytime Core & Drivers meta-packages.
 #
 #	31/05/22 - Once again the package 'broadcom-sta-dkms' is broken with the latest kernel 5.18.
 
