@@ -1,10 +1,11 @@
-name: Build and push packages to PackageCloud.
+name: Build OS
 
 on:
   push:
     branches:
       - "stable"
       - "unstable"
+      - "testing"
     paths-ignore:
       - "README.md"
 
@@ -13,10 +14,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-
-      - name: Install dependencies.
-        run: |
-          sudo gem install package_cloud
 
       - name: Build.
         run: |
