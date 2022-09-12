@@ -38,9 +38,13 @@ base_img_url=https://raw.githubusercontent.com/kaytime/storage/master/RootFS/Deb
 
 #	Prepare the directories for the build.
 
-build_dir=$(mktemp -d)
-iso_dir=$(mktemp -d)
-output_dir=$(mktemp -d)
+mkdir -r system_build
+mkdir -r system_iso
+mkdir -r system_ouput
+
+build_dir=$PWD/system_build
+iso_dir=$PWD/system_iso
+output_dir=$PWD/system_ouput
 
 chmod 755 $build_dir
 
@@ -64,8 +68,8 @@ printf "Installing build tools... "
 
 git clone https://github.com/kaytime/system-builder-kit builder
 
-cd $PWD/builder/tools/runch /bin/runch
-cd $PWD/builder/tools/mkiso /bin/mkiso
+cp $PWD/builder/tools/runch /bin/runch
+cp $PWD/builder/tools/mkiso /bin/mkiso
 chmod +x /bin/runch
 chmod +x /bin/mkiso
 
