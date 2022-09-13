@@ -16,5 +16,9 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Build.
+        env:
+          BASE_IMAGE_STABLE: ${{ secrets.BASE_IMAGE_STABLE }}
+          BASE_IMAGE_UNSTABLE: ${{ secrets.BASE_IMAGE_UNSTABLE }}
+          BASE_IMAGE_TESTING: ${{ secrets.BASE_IMAGE_TESTING }}
         run: |
           sudo ./build.sh

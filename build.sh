@@ -34,7 +34,29 @@ apt -yy install $XORRISO_PKGS $GRUB_EFI_PKGS --no-install-recommends >/dev/null
 
 git_commit=$(git rev-parse --short HEAD)
 git_current_branch=$(git rev-parse --abbrev-ref HEAD)
-base_img_url=https://raw.githubusercontent.com/kaytime/storage/master/RootFS/Debian/Unstable/rootfs.tar.xz
+base_img_url="stable"
+
+# Switch
+while :; do
+    case $git_current_branch in
+    stable)
+        base_img_url=$BASE_IMAGE_STABLE
+        break
+        ;;
+    unstable)
+        base_img_url=$BASE_IMAGE_UNSTABLE
+        break
+        ;;
+    testing)
+        base_img_url=$BASE_IMAGE_TESTING
+        break
+        ;;
+    *)
+        base_img_url=$BASE_IMAGE_STABLE
+        break
+        ;;
+    esac
+done
 
 #	Prepare the directories for the build.
 
