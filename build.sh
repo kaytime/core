@@ -117,10 +117,8 @@ rm -r $iso_dir/home/{travis,Travis} || true
 
 #	Create RootFS File.
 
-printf "Creating $root_fs... "
-
 cd "$build_dir"
-ls -a
+
 tar -cpf ../"$root_fs" *
 cd ..
 echo "Done!"
@@ -129,8 +127,6 @@ echo "Compressing $root_fs with XZ (using $(nproc) threads)..."
 xz -v --threads=$(nproc) "$root_fs"
 
 # Moving generated archive
-
-mv $root_fs.xz "$OUTDIR_DIR/$root_fs.xz"
 
 echo "Successfully created $root_fs.xz."
 
