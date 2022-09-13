@@ -98,18 +98,19 @@ rm -r $iso_dir/home/{travis,Travis} || true
 printf "Creating $root_fs... "
 
 cd "$build_dir"
-tar -cpf ../"$output_dir/$root_fs" *
+ls -a
+tar -cpf ../"$root_fs" *
 cd ..
 echo "Done!"
 
 echo "Compressing $root_fs with XZ (using $(nproc) threads)..."
 xz -v --threads=$(nproc) "$root_fs"
+
+# Moving generated archive
+
+mv $root_fs.xz "$OUTDIR_DIR/$root_fs.xz"
+
 echo "Successfully created $root_fs.xz."
-
-printf "SHA256 checksum for this build: "
-sha256sum "$output_dir/$root_fs".xz | sed "s/  "$output_dir/$root_fs".xz//"
-
-cp $output_dir/$root_fs".xz" $output_dir/$root_fs_latest".xz"
 
 #	Copy the kernel and initramfs to $iso_dir.
 #	BUG: vmlinuz and initrd are not moved to $iso_dir/; they're left at $build_dir/boot
