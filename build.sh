@@ -35,30 +35,7 @@ apt -yy install $XORRISO_PKGS $GRUB_EFI_PKGS --no-install-recommends >/dev/null
 GIT_COMMIT=$(git rev-parse --short HEAD)
 GIT_CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
 OS_VERSION="0.1.0-alpha"
-BASE_IMAGE_VERSION=""
-
-# Switch
-while :; do
-    case $GIT_CURRENT_BRANCH in
-    stable)
-        BASE_IMAGE_VERSION=$BASE_IMG_STABLE_VERSION
-        break
-        ;;
-    unstable)
-        BASE_IMAGE_VERSION=$BASE_IMG_UNSTABLE_VERSION
-        break
-        ;;
-    testing)
-        BASE_IMAGE_VERSION=$BASE_IMG_TESTING_VERSION
-        break
-        ;;
-    *)
-        echo "Unknow branch"
-        exit
-        break
-        ;;
-    esac
-done
+BASE_IMAGE_VERSION="0.1.0-alpha"
 
 BASE_IMG_URL="https://github.com/kaytime/base/releases/download/$BASE_IMAGE_VERSION/rootfs-$GIT_CURRENT_BRANCH-latest-$ARCH.tar.xz"
 
