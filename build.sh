@@ -79,7 +79,7 @@ chmod +x /bin/mkiso
 
 printf "Creating filesystem..."
 
-runch core.sh $GIT_CURRENT_BRANCH \
+runch <core.sh $GIT_CURRENT_BRANCH \
     -m builder/configs:/configs \
     -r /configs \
     -m layouts:/layouts \
