@@ -41,9 +41,9 @@ BASE_IMG_URL="https://github.com/kaytime/base/releases/download/$BASE_IMAGE_VERS
 
 #	Prepare the directories for the build.
 
-mkdir -r system_build
-mkdir -r system_iso
-mkdir -r system_ouput
+mkdir system_build
+mkdir system_iso
+mkdir system_ouput
 
 build_dir=$PWD/system_build
 iso_dir=$PWD/system_iso
