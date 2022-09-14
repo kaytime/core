@@ -38,7 +38,6 @@ install_basic_packages
 
 puts "ADDING REPOSITORY KEYS."
 
-add_kaytime_key_repo
 add_kaytime_key_compat
 
 while :; do
