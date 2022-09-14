@@ -34,10 +34,10 @@ apt -yy install $XORRISO_PKGS $GRUB_EFI_PKGS --no-install-recommends >/dev/null
 
 GIT_COMMIT=$(git rev-parse --short HEAD)
 GIT_CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
-OS_VERSION="0.1.0-alpha"
-BASE_IMAGE_VERSION="0.1.0-alpha"
+OS_VERSION=0.1.0-alpha
+BASE_IMAGE_VERSION=0.1.0-alpha
 
-BASE_IMG_URL="https://github.com/kaytime/base/releases/download/$BASE_IMAGE_VERSION/rootfs-$GIT_CURRENT_BRANCH-latest-$ARCH.tar.xz"
+BASE_IMG_URL=https://github.com/kaytime/base/releases/download/$BASE_IMAGE_VERSION/rootfs-$GIT_CURRENT_BRANCH-latest-$ARCH.tar.xz
 
 #	Prepare the directories for the build.
 
@@ -55,9 +55,9 @@ config_dir=$PWD/builder/configs
 
 #	The name of the ISO image.
 
-system_image="kaytime-core-$OS_VERSION-$ARCH.iso"
-root_fs="kaytime-core-rootfs-$OS_VERSION-$ARCH.tar"
-hash_url="http://updates.os.kaytime.com/${system_image%.iso}.md5sum"
+system_image=kaytime-core-$OS_VERSION-$ARCH.iso
+root_fs=kaytime-core-rootfs-$OS_VERSION-$ARCH.tar
+hash_url=http://updates.os.kaytime.com/${system_image%.iso}.md5sum
 
 #	Prepare the directory where the filesystem will be created.
 
@@ -79,7 +79,7 @@ chmod +x /bin/mkiso
 
 printf "Creating filesystem..."
 
-runch <core.sh $GIT_CURRENT_BRANCH \
+< core.sh $GIT_CURRENT_BRANCH runch \
     -m builder/configs:/configs \
     -r /configs \
     -m layouts:/layouts \
