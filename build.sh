@@ -39,6 +39,8 @@ BASE_IMAGE_VERSION=0.1.0-alpha
 
 BASE_IMG_URL=https://github.com/kaytime/base/releases/download/$BASE_IMAGE_VERSION/rootfs-$GIT_CURRENT_BRANCH-latest-$ARCH.tar.xz
 
+echo "BASE_IMG_URL: $BASE_IMG_URL"
+
 #	Prepare the directories for the build.
 
 mkdir system_build
@@ -64,6 +66,8 @@ hash_url=http://updates.os.kaytime.com/${system_image%.iso}.md5sum
 wget -qO base.tar.xz $BASE_IMG_URL
 tar xf base.tar.xz -C $build_dir
 
+ls -a $build_dir
+
 # Install build tools
 
 printf "Installing build tools... "
@@ -79,7 +83,7 @@ chmod +x /bin/mkiso
 
 printf "Creating filesystem..."
 
-< core.sh $GIT_CURRENT_BRANCH runch \
+< core.sh runch \
     -m builder/configs:/configs \
     -r /configs \
     -m layouts:/layouts \
@@ -90,10 +94,6 @@ printf "Creating filesystem..."
 #	Check filesystem size.
 
 du -hs $build_dir
-
-#	Remove CI leftovers.
-
-rm -r $iso_dir/home/{travis,Travis} || true
 
 #	Create RootFS File.
 
