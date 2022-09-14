@@ -64,8 +64,6 @@ hash_url=http://updates.os.kaytime.com/${system_image%.iso}.md5sum
 wget -qO base.tar.xz $BASE_IMG_URL
 tar xf base.tar.xz -C $build_dir
 
-ls -a $build_dir
-
 # Install build tools
 
 printf "Installing build tools... "
