@@ -91,7 +91,7 @@ tar xf base.tar.xz -C $build_dir
 
 printf "Installing build tools... "
 
-git clone https://github.com/kaytime/system-builder-kit builder
+git clone --branch $GIT_CURRENT_BRANCH https://github.com/kaytime/system-builder-kit builder
 
 cp $PWD/builder/tools/runch /bin/runch
 cp $PWD/builder/tools/mkiso /bin/mkiso
