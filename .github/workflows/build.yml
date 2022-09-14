@@ -1,10 +1,11 @@
-name: Build and push packages to PackageCloud.
+name: Build OS
 
 on:
   push:
     branches:
       - "stable"
       - "unstable"
+      - "testing"
     paths-ignore:
       - "README.md"
 
@@ -14,10 +15,10 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Install dependencies.
-        run: |
-          sudo gem install package_cloud
-
       - name: Build.
+        env:
+          BASE_IMG_STABLE_VERSION: ${{ secrets.BASE_IMG_STABLE_VERSION }}
+          BASE_IMG_UNSTABLE_VERSION: ${{ secrets.BASE_IMG_UNSTABLE_VERSION }}
+          BASE_IMG_TESTING_VERSION: ${{ secrets.BASE_IMG_TESTING_VERSION }}
         run: |
           sudo ./build.sh

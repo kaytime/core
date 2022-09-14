@@ -32,13 +32,44 @@ apt -yy install $XORRISO_PKGS $GRUB_EFI_PKGS --no-install-recommends >/dev/null
 
 #	base image URL.
 
-base_img_url=https://raw.githubusercontent.com/kaytime/storage/master/RootFS/Debian/Unstable/rootfs.tar.xz
+GIT_COMMIT=$(git rev-parse --short HEAD)
+GIT_CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+BASE_IMAGE_VERSION=""
+
+# Switch
+while :; do
+    case $GIT_CURRENT_BRANCH in
+    stable)
+        BASE_IMAGE_VERSION=$BASE_IMG_STABLE_VERSION
+        break
+        ;;
+    unstable)
+        BASE_IMAGE_VERSION=$BASE_IMG_UNSTABLE_VERSION
+        break
+        ;;
+    testing)
+        BASE_IMAGE_VERSION=$BASE_IMG_TESTING_VERSION
+        break
+        ;;
+    *)
+        echo "Unknow branch"
+        exit
+        break
+        ;;
+    esac
+done
+
+BASE_IMG_URL="https://github.com/kaytime/base/releases/download/$BASE_IMAGE_VERSION/rootfs-$ARCH-$GIT_CURRENT_BRANCH.tar.xz"
 
 #	Prepare the directories for the build.
 
-build_dir=$(mktemp -d)
-iso_dir=$(mktemp -d)
-output_dir=$(mktemp -d)
+mkdir -r system_build
+mkdir -r system_iso
+mkdir -r system_ouput
+
+build_dir=$PWD/system_build
+iso_dir=$PWD/system_iso
+output_dir=$PWD/system_ouput
 
 chmod 755 $build_dir
 
@@ -46,15 +77,14 @@ config_dir=$PWD/builder/configs
 
 #	The name of the ISO image.
 
-git_commit=$(git rev-parse --short HEAD)
-image=kaytime-core-$(printf "$GITHUB_BRANCH\n")-$(printf "$git_commit")-amd64.iso
-root_fs=kaytime-core-$(printf "$GITHUB_BRANCH\n")-$(printf "$git_commit")-rootfs.tar
-# image=nitrux-$(printf "$TRAVIS_BRANCH\n" | sed "s/legacy/nx-desktop/")-$(date +%Y%m%d)-amd64.iso
+image=kaytime-core-$(printf "$GIT_CURRENT_BRANCH\n")-$(printf "$GIT_COMMIT")-amd64.iso
+root_fs=kaytime-core-$(printf "$GIT_CURRENT_BRANCH\n")-$(printf "$GIT_COMMIT")-rootfs.tar
+root_fs_latest=kaytime-core-$(printf "$GIT_CURRENT_BRANCH\n")-latest-rootfs.tar
 hash_url=http://updates.os.kaytime.com/${image%.iso}.md5sum
 
 #	Prepare the directory where the filesystem will be created.
 
-wget -qO base.tar.xz $base_img_url
+wget -qO base.tar.xz $BASE_IMG_URL
 tar xf base.tar.xz -C $build_dir
 
 # Install build tools
@@ -63,8 +93,8 @@ printf "Installing build tools... "
 
 git clone https://github.com/kaytime/system-builder-kit builder
 
-cd $PWD/builder/tools/runch /bin/runch
-cd $PWD/builder/tools/mkiso /bin/mkiso
+cp $PWD/builder/tools/runch /bin/runch
+cp $PWD/builder/tools/mkiso /bin/mkiso
 chmod +x /bin/runch
 chmod +x /bin/mkiso
 
@@ -72,7 +102,7 @@ chmod +x /bin/mkiso
 
 printf "Creating filesystem... "
 
-runch core.sh $GIT_BRANCH \
+runch core.sh $GIT_CURRENT_BRANCH \
     -m builder/configs:/configs \
     -r /configs \
     -m layouts:/layouts \
@@ -90,19 +120,18 @@ rm -r $iso_dir/home/{travis,Travis} || true
 
 #	Create RootFS File.
 
-printf "Creating $root_fs... "
-
 cd "$build_dir"
-tar -cpf ../"$output_dir/$root_fs" *
+
+tar -cpf ../"$root_fs" *
 cd ..
 echo "Done!"
 
 echo "Compressing $root_fs with XZ (using $(nproc) threads)..."
 xz -v --threads=$(nproc) "$root_fs"
-echo "Successfully created $root_fs.xz."
 
-printf "SHA256 checksum for this build: "
-sha256sum "$output_dir/$root_fs".xz | sed "s/  "$output_dir/$root_fs".xz//"
+# Moving generated archive
+
+echo "Successfully created $root_fs.xz."
 
 #	Copy the kernel and initramfs to $iso_dir.
 #	BUG: vmlinuz and initrd are not moved to $iso_dir/; they're left at $build_dir/boot
@@ -144,7 +173,7 @@ mkiso \
     -b \
     -e \
     -s "$hash_url" \
-    -r "$(printf "$git_commit")" \
+    -r "$(printf "$GIT_COMMIT")" \
     -g $config_dir/files/grub.cfg \
     -g $config_dir/files/loopback.cfg \
     -t system-grub-theme/kaytime \
@@ -153,3 +182,5 @@ mkiso \
 #	Calculate the checksum.
 
 md5sum $output_dir/$image >$output_dir/${image%.iso}.md5sum
+
+echo "Done!"

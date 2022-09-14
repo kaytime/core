@@ -38,9 +38,29 @@ install_basic_packages
 
 puts "ADDING REPOSITORY KEYS."
 
-add_kaytime_key_repo
 add_kaytime_key_compat
-add_kaytime_key_testing
+
+while :; do
+	case $BUILD_CHANNEL in
+	stable)
+		add_kaytime_key_stable
+		break
+		;;
+	unstable)
+		add_kaytime_key_unstable
+		break
+		;;
+	testing)
+		add_kaytime_key_testing
+		break
+		;;
+	*)
+		echo "This branch $BUILD_CHANNEL doesn't not exist"
+		exit
+		break
+		;;
+	esac
+done
 
 #	Copy repository sources.
 
@@ -108,16 +128,9 @@ adding_casper
 
 #	Add kernel.
 
-add_repo_keys \
-	86F7D09EE734E623 >/dev/null
-
-cp /configs/files/sources.list.xanmod /etc/apt/sources.list.d/xanmod-repo.list
-
-update
-
 puts "ADDING KERNEL."
 
-install_firmware_layout
+adding_system_firmware
 
 #	Add Plymouth.
 #
@@ -127,6 +140,10 @@ install_firmware_layout
 puts "ADDING PLYMOUTH."
 
 adding_plymouth
+
+puts "ADDING BOOTSCREEN."
+
+adding_system_bootscreen
 
 #	Adding PolicyKit packages from Devuan.
 #
@@ -149,7 +166,7 @@ puts "ADDING DEVUAN MISC. PACKAGES."
 
 adding_devuan_misc_packages
 
-#	Add Kaytime meta-packages.
+#	Add Kaytime Core & Drivers meta-packages.
 #
 #	31/05/22 - Once again the package 'broadcom-sta-dkms' is broken with the latest kernel 5.18.
 
@@ -177,16 +194,6 @@ NVIDIA_DRV_PKGS='
 '
 
 install $NVIDIA_DRV_PKGS
-
-#	Add Calamares.
-#
-#	The package from KDE Neon is compiled against libkpmcore12 (22.04) and libboost-python1.71.0 from
-#	Ubuntu which provides the virtual package libboost-python1.71.0-py38. The package from Debian doesn't
-#	offer this virtual dependency.
-
-# puts "ADDING CALAMARES INSTALLER."
-
-# adding_system_installer
 
 #	Upgrade MESA packages.
 
@@ -222,7 +229,7 @@ only_upgrade_force_overwrite $MESA_LIBS_PKGS
 #	Due to how the upstream openrc package "works," we need to put this package at the end of the build process.
 #	Otherwise, we end up with an unbootable system.
 #
-#	See https://github.com/kaytime/openrc-config/issues/1
+#	See https://github.com/kaytime/system-openrc-config/issues/1
 
 puts "ADDING OPENRC CONFIG."
 
