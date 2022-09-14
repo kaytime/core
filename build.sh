@@ -32,31 +32,34 @@ apt -yy install $XORRISO_PKGS $GRUB_EFI_PKGS --no-install-recommends >/dev/null
 
 #	base image URL.
 
-git_commit=$(git rev-parse --short HEAD)
-git_current_branch=$(git rev-parse --abbrev-ref HEAD)
-base_img_url="stable"
+GIT_COMMIT=$(git rev-parse --short HEAD)
+GIT_CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+BASE_IMAGE_VERSION=""
 
 # Switch
 while :; do
-    case $git_current_branch in
+    case $GIT_CURRENT_BRANCH in
     stable)
-        base_img_url=$BASE_IMAGE_STABLE
+        BASE_IMAGE_VERSION=$BASE_IMG_STABLE_VERSION
         break
         ;;
     unstable)
-        base_img_url=$BASE_IMAGE_UNSTABLE
+        BASE_IMAGE_VERSION=$BASE_IMG_UNSTABLE_VERSION
         break
         ;;
     testing)
-        base_img_url=$BASE_IMAGE_TESTING
+        BASE_IMAGE_VERSION=$BASE_IMG_TESTING_VERSION
         break
         ;;
     *)
-        base_img_url=$BASE_IMAGE_STABLE
+        echo "Unknow branch"
+        exit
         break
         ;;
     esac
 done
+
+BASE_IMG_URL="https://github.com/kaytime/base/releases/download/$BASE_IMAGE_VERSION/rootfs-$ARCH-$GIT_CURRENT_BRANCH.tar.xz"
 
 #	Prepare the directories for the build.
 
@@ -74,14 +77,14 @@ config_dir=$PWD/builder/configs
 
 #	The name of the ISO image.
 
-image=kaytime-core-$(printf "$git_current_branch\n")-$(printf "$git_commit")-amd64.iso
-root_fs=kaytime-core-$(printf "$git_current_branch\n")-$(printf "$git_commit")-rootfs.tar
-root_fs_latest=kaytime-core-$(printf "$git_current_branch\n")-latest-rootfs.tar
+image=kaytime-core-$(printf "$GIT_CURRENT_BRANCH\n")-$(printf "$GIT_COMMIT")-amd64.iso
+root_fs=kaytime-core-$(printf "$GIT_CURRENT_BRANCH\n")-$(printf "$GIT_COMMIT")-rootfs.tar
+root_fs_latest=kaytime-core-$(printf "$GIT_CURRENT_BRANCH\n")-latest-rootfs.tar
 hash_url=http://updates.os.kaytime.com/${image%.iso}.md5sum
 
 #	Prepare the directory where the filesystem will be created.
 
-wget -qO base.tar.xz $base_img_url
+wget -qO base.tar.xz $BASE_IMG_URL
 tar xf base.tar.xz -C $build_dir
 
 # Install build tools
@@ -99,7 +102,7 @@ chmod +x /bin/mkiso
 
 printf "Creating filesystem... "
 
-runch core.sh $git_current_branch \
+runch core.sh $GIT_CURRENT_BRANCH \
     -m builder/configs:/configs \
     -r /configs \
     -m layouts:/layouts \
@@ -170,7 +173,7 @@ mkiso \
     -b \
     -e \
     -s "$hash_url" \
-    -r "$(printf "$git_commit")" \
+    -r "$(printf "$GIT_COMMIT")" \
     -g $config_dir/files/grub.cfg \
     -g $config_dir/files/loopback.cfg \
     -t system-grub-theme/kaytime \

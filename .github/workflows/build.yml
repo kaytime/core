@@ -17,8 +17,8 @@ jobs:
 
       - name: Build.
         env:
-          BASE_IMAGE_STABLE: ${{ secrets.BASE_IMAGE_STABLE }}
-          BASE_IMAGE_UNSTABLE: ${{ secrets.BASE_IMAGE_UNSTABLE }}
-          BASE_IMAGE_TESTING: ${{ secrets.BASE_IMAGE_TESTING }}
+          BASE_IMG_STABLE_VERSION: ${{ secrets.BASE_IMG_STABLE_VERSION }}
+          BASE_IMG_UNSTABLE_VERSION: ${{ secrets.BASE_IMG_UNSTABLE_VERSION }}
+          BASE_IMG_TESTING_VERSION: ${{ secrets.BASE_IMG_TESTING_VERSION }}
         run: |
           sudo ./build.sh
