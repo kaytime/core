@@ -8,7 +8,9 @@ export DEBIAN_FRONTEND=noninteractive
 
 puts() { printf "\n\n --- %s\n" "$*"; }
 
-BUILD_CHANNEL=$1
+BUILD_CHANNEL=$GIT_CURRENT_BRANCH
+
+printf "BUILD_CHANNEL: $BUILD_CHANNEL"
 
 #	Wrap APT commands in functions.
 

@@ -33,13 +33,11 @@ apt -yy install $XORRISO_PKGS $GRUB_EFI_PKGS --no-install-recommends >/dev/null
 #	base image URL.
 
 GIT_COMMIT=$(git rev-parse --short HEAD)
-GIT_CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+export GIT_CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
 OS_VERSION=0.1.0-alpha
 BASE_IMAGE_VERSION=0.1.0-alpha
 
 BASE_IMG_URL=https://github.com/kaytime/base/releases/download/$BASE_IMAGE_VERSION/rootfs-$GIT_CURRENT_BRANCH-latest-$ARCH.tar.xz
-
-echo "BASE_IMG_URL: $BASE_IMG_URL"
 
 #	Prepare the directories for the build.
 
