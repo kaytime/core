@@ -34,6 +34,7 @@ apt -yy install $XORRISO_PKGS $GRUB_EFI_PKGS --no-install-recommends >/dev/null
 
 GIT_COMMIT=$(git rev-parse --short HEAD)
 GIT_CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+OS_VERSION="0.1.0-alpha"
 BASE_IMAGE_VERSION=""
 
 # Switch
@@ -59,7 +60,7 @@ while :; do
     esac
 done
 
-BASE_IMG_URL="https://github.com/kaytime/base/releases/download/$BASE_IMAGE_VERSION/rootfs-$ARCH-$GIT_CURRENT_BRANCH.tar.xz"
+BASE_IMG_URL="https://github.com/kaytime/base/releases/download/$BASE_IMAGE_VERSION/rootfs-$GIT_CURRENT_BRANCH-latest-$ARCH.tar.xz"
 
 #	Prepare the directories for the build.
 
@@ -77,10 +78,9 @@ config_dir=$PWD/builder/configs
 
 #	The name of the ISO image.
 
-image=kaytime-core-$(printf "$GIT_CURRENT_BRANCH\n")-$(printf "$GIT_COMMIT")-amd64.iso
-root_fs=kaytime-core-$(printf "$GIT_CURRENT_BRANCH\n")-$(printf "$GIT_COMMIT")-rootfs.tar
-root_fs_latest=kaytime-core-$(printf "$GIT_CURRENT_BRANCH\n")-latest-rootfs.tar
-hash_url=http://updates.os.kaytime.com/${image%.iso}.md5sum
+system_image="kaytime-core-$OS_VERSION-$ARCH.iso"
+root_fs="kaytime-core-rootfs-$OS_VERSION-$ARCH.tar"
+hash_url="http://updates.os.kaytime.com/${system_image%.iso}.md5sum"
 
 #	Prepare the directory where the filesystem will be created.
 
@@ -100,7 +100,7 @@ chmod +x /bin/mkiso
 
 #	Populate $build_dir.
 
-printf "Creating filesystem... "
+printf "Creating filesystem..."
 
 runch core.sh $GIT_CURRENT_BRANCH \
     -m builder/configs:/configs \
@@ -128,8 +128,6 @@ echo "Done!"
 
 echo "Compressing $root_fs with XZ (using $(nproc) threads)..."
 xz -v --threads=$(nproc) "$root_fs"
-
-# Moving generated archive
 
 echo "Successfully created $root_fs.xz."
 
@@ -173,14 +171,14 @@ mkiso \
     -b \
     -e \
     -s "$hash_url" \
-    -r "$(printf "$GIT_COMMIT")" \
+    -r "$(printf "$OS_VERSION")" \
     -g $config_dir/files/grub.cfg \
     -g $config_dir/files/loopback.cfg \
     -t system-grub-theme/kaytime \
-    $iso_dir $output_dir/$image
+    $iso_dir $output_dir/$system_image
 
 #	Calculate the checksum.
 
-md5sum $output_dir/$image >$output_dir/${image%.iso}.md5sum
+md5sum $output_dir/$system_image >$output_dir/${image%.iso}.md5sum
 
 echo "Done!"

@@ -21,4 +21,13 @@ jobs:
           BASE_IMG_UNSTABLE_VERSION: ${{ secrets.BASE_IMG_UNSTABLE_VERSION }}
           BASE_IMG_TESTING_VERSION: ${{ secrets.BASE_IMG_TESTING_VERSION }}
         run: |
-          sudo ./build.sh
+          chmod +x build.sh
+          sudo ./build.sh amd64
+
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.event.head_commit.message }}
+          files: |
+            *.tar.xz
+            $(pwd)/system_ouput/*.iso
