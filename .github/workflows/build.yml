@@ -15,7 +15,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Build.
+      - name: Build
         env:
           BASE_IMG_STABLE_VERSION: ${{ secrets.BASE_IMG_STABLE_VERSION }}
           BASE_IMG_UNSTABLE_VERSION: ${{ secrets.BASE_IMG_UNSTABLE_VERSION }}
