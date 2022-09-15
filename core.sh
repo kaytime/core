@@ -72,11 +72,11 @@ adding_sources_file
 
 #	Upgrade dpkg for zstd support.
 
-UPGRADE_DPKG='
-	dpkg=1.21.1ubuntu1
-'
+# UPGRADE_DPKG='
+# 	dpkg=1.21.1ubuntu1
+# '
 
-install_downgrades $UPGRADE_DPKG
+# install_downgrades $UPGRADE_DPKG
 
 #	Do dist-upgrade.
 
