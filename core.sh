@@ -248,8 +248,7 @@ puts "REMOVE BUILD SOURCES."
 rm \
 	/etc/apt/preferences \
 	/etc/apt/sources.list.d/* \
-	/usr/share/keyrings/kaytime-$BUILD_CHANNEL.gpg \
-	/usr/share/keyrings/kaytime-compat.gpg
+	/usr/share/keyrings/kaytime-$BUILD_CHANNEL.gpg
 
 update
 
