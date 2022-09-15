@@ -40,7 +40,7 @@ install_basic_packages
 
 puts "ADDING REPOSITORY KEYS."
 
-add_kaytime_key_compat
+# add_kaytime_key_compat
 
 while :; do
 	case $BUILD_CHANNEL in
